@@ -1,0 +1,68 @@
+version: '3'
+
+# Containers
+services:
+  # NGINX
+  nginx:
+    build:
+      context: ./build/nginx
+    container_name: lemp_nginx
+    depends_on:
+      - php
+    image: lemp-stack/nginx
+    networks:
+      - lemp-stack
+    ports:
+      - '80:80'
+      - '443:443'
+    restart: always
+    volumes:
+      - ./code:/var/www/code
+      - ./lemp/nginx/config:/etc/nginx
+      - ./certs:/etc/ssl/custom
+      - ./lemp/php/socket:/var/run/socket
+    working_dir: /etc/nginx
+  # PHP-FPM
+  php:
+    build:
+      context: ./build/php
+      args:
+        app_name: ${APP_NAME:-localhost}
+        version: ${PHP_VERSION:-7.3}
+    container_name: lemp_php
+    depends_on:
+      - db
+    image: lemp-stack/php-fpm
+    networks:
+      - lemp-stack
+    ports:
+      - 9000:9000
+    restart: always
+    volumes:
+      - ./code:/var/www/code
+      - ./lemp/php/php.ini:/usr/local/etc/php/php.ini
+      - ./lemp/php/configs:/usr/local/etc/php-fpm.d
+      - ./lemp/php/socket:/var/run/socket
+    working_dir: /var/www/code
+  # MariaDB
+  db:
+    build:
+      context: ./build/db
+    container_name: lemp_db
+    environment:
+      - MYSQL_ROOT_PASSWORD=${ROOT_DB_PASSWORD:-password}
+      - MYSQL_DATABASE=${DATABASE:-default}
+    image: lemp-stack/db
+    networks:
+      - lemp-stack
+    ports:
+      - '3306:3306'
+    restart: always
+    volumes:
+      - db_data:/var/lib/mysql
+# Networks
+networks:
+  lemp-stack:
+# Volumes
+volumes:
+  db_data:
