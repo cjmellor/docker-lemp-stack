@@ -6,12 +6,14 @@ services:
   nginx:
     build:
       context: ./build/nginx
-    container_name: lemp_nginx
+    container_name: ${APP_NAME}_nginx
     depends_on:
       - php
     image: lemp-stack/nginx
     networks:
-      - lemp-stack
+      lemp-stack:
+        aliases:
+          - ${APP_NAME}_stack
     ports:
       - '80:80'
       - '443:443'
@@ -29,12 +31,14 @@ services:
       args:
         app_name: ${APP_NAME:-localhost}
         version: ${PHP_VERSION:-7.3}
-    container_name: lemp_php
+    container_name: ${APP_NAME}_php
     depends_on:
       - db
     image: lemp-stack/php-fpm
     networks:
-      - lemp-stack
+      lemp-stack:
+        aliases:
+          - ${APP_NAME}_stack
     ports:
       - 9000:9000
     restart: always
@@ -48,13 +52,15 @@ services:
   db:
     build:
       context: ./build/db
-    container_name: lemp_db
+    container_name: ${APP_NAME}_db
     environment:
       - MYSQL_ROOT_PASSWORD=${ROOT_DB_PASSWORD:-password}
       - MYSQL_DATABASE=${DATABASE:-default}
     image: lemp-stack/db
     networks:
-      - lemp-stack
+      lemp-stack:
+        aliases:
+          - ${APP_NAME}_stack
     ports:
       - '3306:3306'
     restart: always

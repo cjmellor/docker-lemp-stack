@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 error=$? # All errors are passed to this variable
-dir=$PWD # Put the PWD in a variable - used for easy path mapping
+# dir=$PWD # Put the PWD in a variable - used for easy path mapping
 
 usage() {
   echo "
@@ -55,7 +55,7 @@ fi
 # Generate certificates
 ## Creates self-signed certificates for your app
 
-cd $dir/certs || exit 1
+cd certs || exit 1
 
 MAKE_CERT=$(mkcert "${app}")
 
@@ -68,13 +68,13 @@ fi
 
 # Add new certificates to config
 
-cd $dir/lemp/nginx/config/h5bp/ssl || exit 1
+cd ../lemp/nginx/config/h5bp/ssl || exit 1
 sed -i '.bak' "s#localhost#${app}#g" certificate_files.conf
 rm certificate_files.conf.bak
 
 # Generate new site files
 
-cd $dir/conf.d || exit 1
+cd ../../conf.d || exit 1
 
 # Rename vhost config
 
@@ -89,7 +89,7 @@ rm -f "${app}".conf.bak
 
 # Copy the PHP-FPM config and match it to the app name
 
-cd $dir/php-fpm/configs || exit 1
+cd ../../../php/configs || exit 1
 mv www.conf "${app}".conf
 
 # Change 'www' pool name to same as the app name you chose
@@ -101,7 +101,7 @@ rm -f {"${app}",docker,zz-docker}.conf.bak
 
 # Change the app name in the .env
 
-cd $dir || exit 1
+cd ../../../ || exit 1
 sed -i '.bak' "s#localhost#${app}#" .env
 rm -f .env.bak
 
