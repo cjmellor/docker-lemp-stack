@@ -12,17 +12,15 @@ services:
     image: lemp-stack/nginx
     networks:
       lemp-stack:
-        aliases:
-          - ${APP_NAME}_stack
     ports:
-      - '80:80'
+      - ${APP_PORT:-80}:80
       - '443:443'
     restart: always
     volumes:
       - ./code:/var/www/code
       - ./lemp/nginx/config:/etc/nginx
       - ./certs:/etc/ssl/custom
-      - ./lemp/php/socket:/var/run/socket
+      - phpsocket:/var/run/socket
     working_dir: /etc/nginx
   # PHP-FPM
   php:
@@ -37,16 +35,14 @@ services:
     image: lemp-stack/php-fpm
     networks:
       lemp-stack:
-        aliases:
-          - ${APP_NAME}_stack
     ports:
-      - 9000:9000
+      - ${PHP_PORT:-9000}:9000
     restart: always
     volumes:
       - ./code:/var/www/code
       - ./lemp/php/php.ini:/usr/local/etc/php/php.ini
       - ./lemp/php/configs:/usr/local/etc/php-fpm.d
-      - ./lemp/php/socket:/var/run/socket
+      - phpsocket:/var/run/socket
     working_dir: /var/www/code
   # MariaDB
   db:
@@ -59,10 +55,8 @@ services:
     image: lemp-stack/db
     networks:
       lemp-stack:
-        aliases:
-          - ${APP_NAME}_stack
     ports:
-      - '3306:3306'
+      - ${DB_PORT:-3306}:3306
     restart: always
     volumes:
       - db_data:/var/lib/mysql
@@ -72,3 +66,4 @@ networks:
 # Volumes
 volumes:
   db_data:
+  phpsocket:

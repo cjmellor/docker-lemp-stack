@@ -55,6 +55,10 @@ fi
 # Generate certificates
 ## Creates self-signed certificates for your app
 
+if [ ! -d "certs" ]; then
+  mkdir certs
+fi
+
 cd certs || exit 1
 
 MAKE_CERT=$(mkcert "${app}")
