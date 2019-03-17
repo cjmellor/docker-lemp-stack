@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 error=$? # All errors are passed to this variable
-# dir=$PWD # Put the PWD in a variable - used for easy path mapping
 
 usage() {
   echo "
