@@ -1,0 +1,11 @@
+#!/usr/bin/env php
+<?php
+
+use Console\App\Commands\HelloWorldCommand;
+use Symfony\Component\Console\Application;
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Application('Create a new development application', '0.0.1');
+$app->add(new HelloWorldCommand());
+$app->run();
