@@ -1,0 +1,15 @@
+#!/usr/bin/env php
+<?php
+
+use Dev\CreateApplicationCommand;
+use Dev\RemoveApplicationCommand;
+use Symfony\Component\Console\Application;
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Application('Build and manage a development environment', '0.0.1');
+
+$app->add(new CreateApplicationCommand());
+$app->add(new RemoveApplicationCommand());
+
+$app->run();

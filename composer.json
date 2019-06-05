@@ -1,13 +1,29 @@
 {
+  "name": "cmellor/stacks",
+  "description": "An installer tool that gives you quick access to a LEMP stack using Docker",
+  "license": "MIT",
   "require": {
-    "symfony/console": "^4.2"
+    "php": ">=5.6",
+    "symfony/console": "~3.0|~4.0",
+    "symfony/filesystem": "~3.0|~4.0",
+    "symfony/finder": "~3.0|~4.0",
+    "symfony/process": "~3.0|~4.0"
   },
+  "authors": [
+    {
+      "name": "Chris Mellor",
+      "email": "cmellor@gmail.com"
+    }
+  ],
   "autoload": {
+    "files": [
+      "src/Includes/helpers.php"
+    ],
     "psr-4": {
-      "Console\\": "src"
-    },
-    "classmap": [
-      "src"
-    ]
+      "Dev\\": "src/App/Commands"
+    }
+  },
+  "config": {
+    "sort-packages": true
   }
 }
