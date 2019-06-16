@@ -1,6 +1,6 @@
 <?php
 
-namespace Dev;
+namespace Saber;
 
 use Symfony\Component\Process\Process;
 use Symfony\Component\Filesystem\Filesystem;
@@ -27,16 +27,18 @@ function buildContainer(InputInterface $input)
 
     $dockerCompose = new Process(['docker-compose', 'up', '-d', '--build']);
 
+    output('<comment>Building your application environment...</comment>');
+
     try {
         $progress->setMessage('<comment>Building containers</comment>');
-        
+
         if ($input->getOption('verbose')) {
             $dockerCompose->setTimeout(180)->mustRun(function ($type, $line) {
                 output($line);
             });
         } else {
             $progress->start();
-            
+
             $dockerCompose->setTimeout(180)->mustRun(function () use ($progress) {
                 $progress->advance();
             });
@@ -56,6 +58,24 @@ function buildContainer(InputInterface $input)
 }
 
 /**
+ * Restart PHP and NGINX containers
+ *
+ * @return void
+ */
+function restartContainers()
+{
+    output('<comment>Restarting containers...</comment>');
+
+    $dockerRestartContainer = new Process(['docker-compose', 'restart', 'php', 'nginx']);
+    $dockerRestartContainer->run();
+
+    if (! $dockerRestartContainer->isSuccessful()) {
+        throw new ProcessFailedException($dockerRestartContainer);
+    }
+    output('<comment>Containers restarted!</comment>');
+}
+
+/**
  * Shut down and destroy the Docker container and remove the Network.
  */
 function destroyContainer()
@@ -66,8 +86,6 @@ function destroyContainer()
     if (! $dockerComposerDown->isSuccessful()) {
         throw new ProcessFailedException($dockerComposerDown);
     }
-
-    output('<info>Containers removed!</info>');
 }
 
 /**

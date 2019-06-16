@@ -1,10 +1,10 @@
 <?php
 
-namespace Dev;
+namespace Saber;
 
-use function Dev\output;
-use function Dev\replace;
-use function Dev\buildContainer;
+use function Saber\output;
+use function Saber\replace;
+use function Saber\restartContainers;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Command\Command;
@@ -31,7 +31,7 @@ class CreateApplicationCommand extends Command
             ->setDescription('Creates a new development application environment')
             ->setHelp('Creates a new development environment that will build and run a full LEMP stack with a custom domain.')
             ->addArgument('domain', InputArgument::REQUIRED, 'Creates a new development environment')
-            ->addOption('tls', 't', InputOption::VALUE_NONE, 'Add TLS certificates for the domain');
+            ->addOption('tls', 't', InputOption::VALUE_NONE, 'Add TLS certificates for your app');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -39,26 +39,14 @@ class CreateApplicationCommand extends Command
         $domain = $input->getArgument('domain').'.test';
         $tls = $input->getOption('tls');
 
+        // The TLD is added automatically, so no need to write it out yourself
         if (strpos($input->getArgument('domain'), '.')) {
-            throw new RuntimeException('A domain TLD is not required.');
+            throw new RuntimeException('A domain TLD is not required, this will be added automatically.');
         }
-
-        output('<comment>Building your application environment...</comment>');
 
         // If --tls was enabled, certificates will be generated for the domain
         if ($tls) {
-            // Check if MKCert is installed, if not, install it
-            $this->installMkCert();
-
-            // If the 'certs' folder doesn't exist, create it
-            if (! $this->filesystem->exists($this->path.'/certs')) {
-                $this->filesystem->mkdir($this->path.'/certs');
-            }
-
-            // Run the 'mkcert' command to create certificates.
-            $this->createSelfSignedCertificate($domain);
-
-            output('<info>Cretificates successfully created!</info>');
+            $this->generateCertificate($domain);
         }
 
         // Generate new app configurations.
@@ -66,27 +54,121 @@ class CreateApplicationCommand extends Command
             ? $this->path.'/lemp/nginx/config/conf.d/.default-tls.conf'
             : $this->path.'/lemp/nginx/config/conf.d/.default-no_tls.conf';
 
-        $newConfigFile = $this->path."/lemp/nginx/config/conf.d/{$domain}.conf";
+        $this->createNginxConfig($domain, $configFile);
 
-        $this->filesystem->copy($configFile, $newConfigFile);
+        $this->createPhpConfig($domain);
 
-        // Replace default hostname with custom domain.
-        replace('localhost', $domain, $newConfigFile);
+        restartContainers();
+        
+        output('<info>Application built and ready to use!</info>');
+    }
+
+    private function cleanup(array $fileName, $delimiter)
+    {
+        foreach ($fileName as $configFileName) {
+            $grep = "grep -Ev '^$delimiter|^$' $configFileName";
+
+            $newOutput = shell_exec($grep);
+
+            $this->filesystem->dumpFile($configFileName, $newOutput);
+        }
+    }
+
+    /**
+     * Copy the stub PHP config to the applications config
+     * Replace the stub domain with the application domain
+     * Cleanup the PHP config - removing whitespace
+     *
+     * @param string $domain
+     *
+     * @return void
+     */
+    private function createPhpConfig($domain)
+    {
+        $phpConfig = $this->path."/lemp/php/configs/{$domain}.conf";
+
+        output('<comment>Creating PHP configuration...</comment>');
 
         // Copy the PHP config file to the new app config.
-        $this->filesystem->copy($this->path.'/lemp/php/configs/.www.conf', $this->path."/lemp/php/configs/{$domain}.conf");
+        $this->filesystem->copy($this->path.'/lemp/php/configs/www.conf', $phpConfig);
 
         // Replace the app name in the PHP configs
-        replace('\[www\]', '['.$domain.']', $this->path."/lemp/php/configs/{$domain}.conf");
-        replace('\[www\]', '['.$domain.']', $this->path.'/lemp/php/configs/docker.conf');
-        replace('\[www\]', '['.$domain.']', $this->path.'/lemp/php/configs/zz-docker.conf');
+        replace('\[www\]', '['.$domain.']', $phpConfig);
 
-        // Copy the .env.example file and replace the app name in the .env file
-        $this->filesystem->copy('.env.example', '.env');
-        replace('localhost', $domain, '.env');
+        // Clean up config files, removing all the unwanted commented out code
+        $this->cleanup([$phpConfig], ';');
+    }
 
-        // Run the Docker build
-        buildContainer($input);
+    /**
+     * Copies the stub NGINX config to the applications config
+     * Replace the stub domain with the application domain
+     *
+     * @param string $domain
+     * @param string $config
+     *
+     * @return void
+     */
+    private function createNginxConfig($domain, $config)
+    {
+        $nginxConfig = $this->path."/lemp/nginx/config/conf.d/{$domain}.conf";
+
+        output('<comment>Creating NGINX configuration...</comment>');
+
+        // Make a copy of the stub config for the app
+        $this->filesystem->copy($config, $nginxConfig);
+
+        // Replace default hostname with custom domain.
+        replace('localhost', $domain, $nginxConfig);
+
+        $this->createCodeDirectory($domain);
+    }
+
+    /**
+     * Creates the folder for the application code
+     * Creates an HTML to show it's working
+     *
+     * @param string $domain
+     *
+     * @return void
+     */
+    private function createCodeDirectory($domain)
+    {
+        $codePath = $this->path . '/code/' . $domain;
+
+        // Create a folder for the root code
+        $this->filesystem->mkdir($codePath);
+
+        // Add a HTML file in there to show it's working
+        $this->filesystem->dumpFile($codePath . '/index.html', "<h1>$domain is up and running!</h1>");
+    }
+
+    /**
+     * Generate a self-signed certificate for the specified domain
+     *
+     * @param string $domain
+     *
+     * @return void
+     */
+    private function generateCertificate(string $domain)
+    {
+        $certificateStub = $this->path . '/lemp/nginx/config/h5bp/ssl/certificate_files.conf';
+        $appCertificate = $this->path . '/lemp/nginx/config/ssl/' . $domain . '.conf';
+
+        // Check if MKCert is installed, if not, install it
+        $this->installMkCert();
+
+        // If the 'certs' folder doesn't exist, create it
+        if (! $this->filesystem->exists($this->path.'/certs')) {
+            $this->filesystem->mkdir($this->path.'/certs');
+        }
+
+        // Copy the SSL configuration into it's own app location
+        $this->filesystem->copy($certificateStub, $appCertificate);
+
+        // Run the 'mkcert' command to create certificates.
+        $this->createSelfSignedCertificate($domain);
+
+        output('<info>Cretificates successfully created!</info>');
     }
 
     /**
@@ -108,8 +190,10 @@ class CreateApplicationCommand extends Command
      *
      * @param string $domain
      */
-    private function createSelfSignedCertificate($domain)
+    private function createSelfSignedCertificate(string $domain)
     {
+        $appCertificate = $this->path . '/lemp/nginx/config/ssl/' . $domain . '.conf';
+
         $makeCert = new Process(
             [
                 'mkcert',
@@ -125,6 +209,9 @@ class CreateApplicationCommand extends Command
         }
 
         // Replace default certificate with custom domain.
-        replace('localhost', $domain, $this->path.'/lemp/nginx/config/h5bp/ssl/certificate_files.conf');
+        replace('localhost', $domain, $appCertificate);
+
+        // Clean up the SSL config
+        $this->cleanup([$appCertificate], '#');
     }
 }

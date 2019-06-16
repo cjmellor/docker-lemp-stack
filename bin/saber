@@ -1,8 +1,10 @@
 #!/usr/bin/env php
 <?php
 
-use Dev\CreateApplicationCommand;
-use Dev\RemoveApplicationCommand;
+use Saber\InstallCommand;
+use Saber\UninstallCommand;
+use Saber\CreateApplicationCommand;
+use Saber\RemoveApplicationCommand;
 use Symfony\Component\Console\Application;
 
 require_once __DIR__.'/../vendor/autoload.php';
@@ -10,6 +12,8 @@ require_once __DIR__.'/../vendor/autoload.php';
 $app = new Application('Build and manage a development environment', '0.0.1');
 
 $app->add(new CreateApplicationCommand());
+$app->add(new InstallCommand());
 $app->add(new RemoveApplicationCommand());
+$app->add(new UninstallCommand());
 
 $app->run();

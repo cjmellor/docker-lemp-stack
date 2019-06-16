@@ -1,11 +1,10 @@
 <?php
 
-namespace Dev;
+namespace Saber;
 
-use function Dev\output;
-use function Dev\replace;
-use function Dev\destroyContainer;
+use function Saber\output;
 use Symfony\Component\Finder\Finder;
+use function Saber\restartContainers;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -39,57 +38,94 @@ class RemoveApplicationCommand extends Command
 
         $domain = $input->getArgument('domain').'.test';
 
-        // Removes certificates associated with applicatiob
-        output('<comment>Removing certificates...</comment>');
-        $this->removeCertificates();
+        output('<info>Removing "' . $domain . '" configuration...</info>');
+
+        // Removes certificates associated with application, if they exist
+        if ((new Filesystem())->exists('certs/' . $domain . '.crt')) {
+            output('<comment>Removing certificates...</comment>');
+            $this->removeCertificates($domain);
+        }
+
+        // Remove code folder
+        $this->remove('code/' . $domain);
 
         // Removed the applications NGINX config
-        output('<comment>Removing NGINX configuration files...</comment>');
-        $this->removeNginxConfig();
+        $this->removeNginxConfig($domain);
 
         // Removes the PHP config
-        output('<comment>Removing PHP configuration files...</comment>');
-        $this->removePhpConfig();
+        $this->removePhpConfig($domain);
 
-        // Remove .env file
-        output('<comment>Removing .env file...</comment>');
-        (new Filesystem)->remove('.env');
+        // Restart containers
+        restartContainers();
 
-        output('<comment>Cleaning up...</comment>');
-
-        // Change the value back to localhost in the H5BP SSL certificate file
-        replace($domain, 'localhost', $this->path.'/lemp/nginx/config/h5bp/ssl/certificate_files.conf');
-
-        // Change the default process name back to the originals
-        replace($domain, 'www', $this->path.'/lemp/php/configs/docker.conf');
-        replace($domain, 'www', $this->path.'/lemp/php/configs/zz-docker.conf');
-
-        // Shut down and remove Docker containers
-        destroyContainer();
+        output('<info>Application has been removed</info>');
     }
 
     /**
      * Remove PHP configuration file.
+     *
+     * @param mixed $domain
      */
-    private function removePhpConfig()
+    private function removePhpConfig($domain)
     {
-        return $this->remove('lemp/php/configs', ['docker.conf', 'zz-docker.conf']);
+        output('<comment>Removing PHP configuration files...</comment>');
+
+        return $this->delete([
+            'lemp/php/configs/' . $domain . '.conf',
+        ]);
     }
 
     /**
      * Remove NGINX configuration.
+     *
+     * @param mixed $domain
      */
-    private function removeNginxConfig()
+    private function removeNginxConfig($domain)
     {
-        return $this->remove('lemp/nginx/config/conf.d');
+        output('<comment>Removing NGINX configuration files...</comment>');
+
+        return $this->delete([
+            'lemp/nginx/config/conf.d/' . $domain . '.conf',
+        ]);
     }
 
     /**
      * Remove certificates from 'certs' folder.
+     *
+     * @param mixed $domain
      */
-    private function removeCertificates()
+    private function removeCertificates($domain)
     {
-        return $this->remove('certs');
+        $this->delete([
+            'certs/' . $domain . '.crt',
+            'certs/' . $domain . '-key.key',
+        ]);
+    }
+
+    private function delete(array $files)
+    {
+        return (new Filesystem())->remove($files);
+    }
+
+    /**
+     * Remove files from selected folder.
+     *
+     * @param string $path
+     * @param array        $excludeFiles
+     */
+    private function remove($path, array $excludeFiles = [])
+    {
+        if (is_array($excludeFiles)) {
+            $files = $this->in($path, $excludeFiles);
+        }
+
+        $files = $this->in($path);
+
+        foreach ($files as $file) {
+            (new Filesystem)->remove($file->getRealPath());
+        }
+
+        return $this;
     }
 
     /**
@@ -107,26 +143,5 @@ class RemoveApplicationCommand extends Command
         }
 
         return $this->finder->files()->in($pathToFolder);
-    }
-
-    /**
-     * Remove files from selected folder.
-     *
-     * @param array|string $path
-     * @param array        $excludeFiles
-     */
-    private function remove($path, array $excludeFiles = [])
-    {
-        if (is_array($excludeFiles)) {
-            $files = $this->in($path, $excludeFiles);
-        }
-
-        $files = $this->in($path);
-
-        foreach ($files as $file) {
-            (new Filesystem)->remove($file->getRealPath());
-        }
-
-        return $this;
     }
 }

@@ -6,7 +6,7 @@ services:
   nginx:
     build:
       context: ./build/nginx
-    container_name: ${APP_NAME}_nginx
+    container_name: saber_nginx
     depends_on:
       - php
     image: lemp-stack/nginx
@@ -14,7 +14,7 @@ services:
       lemp-stack:
     ports:
       - ${APP_PORT:-80}:80
-      - '443:443'
+      - ${APP_SSL_PORT:-443}:443
     restart: always
     volumes:
       - ./code:/var/www/code
@@ -27,9 +27,8 @@ services:
     build:
       context: ./build/php
       args:
-        app_name: ${APP_NAME:-localhost}
-        version: ${PHP_VERSION:-7.3}
-    container_name: ${APP_NAME}_php
+        version: ${PHP_VERSION}
+    container_name: saber_php
     depends_on:
       - db
     image: lemp-stack/php-fpm
@@ -48,7 +47,7 @@ services:
   db:
     build:
       context: ./build/db
-    container_name: ${APP_NAME}_db
+    container_name: saber_db
     environment:
       - MYSQL_ROOT_PASSWORD=${ROOT_DB_PASSWORD:-password}
       - MYSQL_DATABASE=${DATABASE:-default}

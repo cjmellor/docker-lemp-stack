@@ -7,3 +7,4 @@ lemp/nginx/config/.github
 lemp/nginx/config/.gitattributes
 lemp/nginx/config/.gitignore
 lemp/nginx/config/LICENSE.txt
+lemp/nginx/config/conf.d/.default-*.conf

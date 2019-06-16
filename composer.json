@@ -1,9 +1,9 @@
 {
-  "name": "cmellor/stacks",
+  "name": "Saber",
   "description": "An installer tool that gives you quick access to a LEMP stack using Docker",
   "license": "MIT",
   "require": {
-    "php": ">=5.6",
+    "php": "^7.1.3",
     "symfony/console": "~3.0|~4.0",
     "symfony/filesystem": "~3.0|~4.0",
     "symfony/finder": "~3.0|~4.0",
@@ -20,10 +20,10 @@
       "src/Includes/helpers.php"
     ],
     "psr-4": {
-      "Dev\\": "src/App/Commands"
+      "Saber\\": "src/App/Commands"
     }
   },
-  "config": {
-    "sort-packages": true
-  }
+  "bin": [
+    "saber"
+  ]
 }
