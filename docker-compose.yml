@@ -40,7 +40,7 @@ services:
     volumes:
       - ./code:/var/www/code
       - ./lemp/php/php.ini:/usr/local/etc/php/php.ini
-      - ./lemp/php/configs:/usr/local/etc/php-fpm.d
+      - ./lemp/php/config:/usr/local/etc/php-fpm.d
       - phpsocket:/var/run/socket
     working_dir: /var/www/code
   # MariaDB
