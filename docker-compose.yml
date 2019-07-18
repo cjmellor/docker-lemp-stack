@@ -47,6 +47,8 @@ services:
   db:
     build:
       context: ./build/db
+      args:
+        db_name: ${DATABASE_NAME}
     container_name: saber_db
     environment:
       - MYSQL_ROOT_PASSWORD=${ROOT_DB_PASSWORD:-password}

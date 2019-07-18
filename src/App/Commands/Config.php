@@ -70,7 +70,7 @@ class Config
     {
         $this->validateDatabase($database_image);
 
-        replace('FROM (.+)', 'FROM ' . $database_image, 'build/db/Dockerfile');
+        replace('DATABASE_NAME=(.+)|DATABASE_NAME=', 'DATABASE_NAME=' . ($database_image ?: DEFAULT_DATABASE_IMAGE), '.env');
 
         info("Installing database: <fg=white>$database_image</>");
     }

@@ -1,6 +1,10 @@
 {
-  "name": "Saber",
-  "description": "An installer tool that gives you quick access to a LEMP stack using Docker",
+  "name": "cjmellor/saber",
+  "description": "Build a custom LEMP stack running off Docker containers",
+  "keywords": [
+    "lemp",
+    "docker"
+  ],
   "license": "MIT",
   "require": {
     "php": "^7.1.3",

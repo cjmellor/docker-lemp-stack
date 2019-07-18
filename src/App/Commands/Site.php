@@ -150,7 +150,7 @@ class Site
      * @param string $domain
      * @return void
      */
-    public function removenNginxConfig($domain)
+    public function removeNginxConfig($domain)
     {
         info('Removing NGINX configuration file...');
 
