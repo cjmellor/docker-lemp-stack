@@ -1,0 +1,4 @@
+*.conf
+!www.conf
+!docker.conf
+!zz-docker.conf
