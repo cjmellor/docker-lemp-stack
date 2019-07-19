@@ -1,3 +1,5 @@
+[![StyleCI](https://github.styleci.io/repos/174240042/shield?branch=master)](https://github.styleci.io/repos/174240042)
+
 # Table of Contents
 
 - [Introduction](#introduction)
@@ -132,19 +134,13 @@ There are two methods for installing Saber:
 First, you need to install the package.
 
 ```shell
-composer require cjmellor/saber
+composer create-project cjmellor/saber <target-directory>
 ```
 
-then run
+`cd` to the target directory then run
 
 ```shell
-saber install
-```
-
-and install the dependencies
-
-```shell
-composer update
+./saber install
 ```
 
 ## Method #2
