@@ -154,7 +154,7 @@ class Site
     {
         info('Removing NGINX configuration file...');
 
-        $this->file->deleteFiles(SABER_HOME_CONFIG_PATH . 'lemp/nginx/config/conf.d/' . $domain . '.conf');
+        $this->file->deleteFiles(SABER_HOME_CONFIG_PATH . '/lemp/nginx/config/conf.d/' . $domain . '.conf');
     }
 
     /**
@@ -167,7 +167,22 @@ class Site
     {
         info('Removing PHP configuration file...');
 
-        $this->file->deleteFiles(SABER_HOME_CONFIG_PATH . 'lemp/php/config/' . $domain . '.conf');
+        $this->file->deleteFiles(SABER_HOME_CONFIG_PATH . '/lemp/php/config/' . $domain . '.conf');
+    }
+
+    /**
+     * Removes the code directory for the app
+     *
+     * @param string $domain
+     * @return void
+     */
+    public function removeSiteCodeDirectory($domain)
+    {
+        $codeFolderPath = SABER_HOME_CONFIG_PATH . '/code/' . $domain;
+
+        if ($this->file->folderExists($codeFolderPath)) {
+            $this->file->removeDirectory($codeFolderPath);
+        }
     }
 
     /**
