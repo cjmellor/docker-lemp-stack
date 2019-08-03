@@ -112,6 +112,9 @@ $app->command('remove domain', function ($domain) {
     // Remove PHP config
     Site::removePhpConfig($domain);
 
+    // Remove the app's code directory
+    Site::removeSiteCodeDirectory($domain);
+
     // Restart containers
     Docker::restartContainers();
 })->descriptions('Remove a development environment', [
