@@ -44,3 +44,6 @@ class Config extends Facade
 class Site extends Facade
 {
 }
+class Secure extends Facade
+{
+}

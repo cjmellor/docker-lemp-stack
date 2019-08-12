@@ -31,7 +31,7 @@ $app->command('install [--php=] [--db=]', function ($php = DEFAULT_PHP_VERSION, 
 
     // Get the chosen database version
     Config::selectDatabase($db);
-    
+
     // Pre-installation - moving files to where they need to be
     Config::preInstall();
 
@@ -120,5 +120,19 @@ $app->command('remove domain', function ($domain) {
 })->descriptions('Remove a development environment', [
     'domain' => 'The name of the app you want to remove'
 ]);
+
+/**
+ * Secure a non-secure site
+ */
+$app->command('secure domain', function ($domain) {
+    // Check if the site is already secure
+    Secure::checkSecureStatus($domain);
+
+    // Secure the site
+    Secure::secure($domain);
+
+    // Restart containers
+    Docker::restartContainers();
+});
 
 $app->run();
