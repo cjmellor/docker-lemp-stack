@@ -2,6 +2,7 @@
 <?php
 
 use Illuminate\Container\Container;
+use function Saber\info;
 use function Saber\success;
 use Silly\Application;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
@@ -128,11 +129,37 @@ $app->command('secure domain', function ($domain) {
     // Check if the site is already secure
     Secure::checkSecureStatus($domain);
 
+    info('Securing site...');
+
     // Secure the site
     Secure::secure($domain);
 
+    success('Site secured!');
+
     // Restart containers
     Docker::restartContainers();
-});
+})->descriptions('Applies a certificate to the app', [
+  'domain' => 'The name of the app your want to secure'
+]);
+
+/**
+ * Make's a site unsecure
+ */
+$app->command('unsecure domain', function ($domain) {
+    // Check if the site exists
+    Secure::checkSecureStatus($domain, true);
+
+    info('Unsecuring site...');
+
+    // Unsecure the site
+    Secure::unsecure($domain);
+
+    success('Site is now unsecure.');
+
+    // Restart containers
+    Docker::restartContainers();
+})->descriptions('Removes the certificate for the app', [
+  'domain' => 'The name of the app your want to unsecure'
+]);;
 
 $app->run();
