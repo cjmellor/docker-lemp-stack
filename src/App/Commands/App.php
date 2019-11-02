@@ -4,7 +4,7 @@ namespace Saber;
 
 use Exception;
 
-class Site
+class App
 {
     public $file;
 
@@ -26,7 +26,7 @@ class Site
         $this->installMkCert();
 
         // If the 'certs' folder doesn't exist, create it
-        if (! $this->file->folderExists(SABER_HOME_CONFIG_PATH . '/certs')) {
+        if (!$this->file->folderExists(SABER_HOME_CONFIG_PATH . '/certs')) {
             $this->file->createDirectory(SABER_HOME_CONFIG_PATH . '/certs');
         }
 
@@ -63,7 +63,7 @@ class Site
      */
     public function installMkCert()
     {
-        if (! $this->file->folderExists(getenv('HOME') . '/Library/Application Support/mkcert')) {
+        if (!$this->file->folderExists(getenv('HOME') . '/Library/Application Support/mkcert')) {
             info('Installing MKCert...');
             $this->cli->run('brew install mkcert');
             success('MKCert installed!');
