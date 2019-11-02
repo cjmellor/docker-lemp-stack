@@ -5,8 +5,8 @@ namespace Saber;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Filesystem\Filesystem;
 
-define('SABER_HOME_CONFIG_PATH', $_SERVER['HOME'] . '/.config/saber');
-define('DEFAULT_PHP_VERSION', 7.2);
+define('SABER_HOME_CONFIG_PATH', realpath(__DIR__ . '/../../'));
+define('DEFAULT_PHP_VERSION', 7.3);
 define('DEFAULT_DATABASE_IMAGE', 'mariadb:latest');
 
 
