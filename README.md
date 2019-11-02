@@ -1,27 +1,5 @@
 [![StyleCI](https://github.styleci.io/repos/174240042/shield?branch=master)](https://github.styleci.io/repos/174240042)
 
-# Table of Contents
-
-- [Introduction](#introduction)
-  - [Prerequisites](#prerequisites)
-  - [Configuring DNSMasq](#configuring-dnsmasq)
-- [Why Saber?](#why-saber)
-- [Installation](#installation)
-  - [Automatically](#automatically)
-  - [Manually](#manually)
-  - [Available installation options](#available-installation-options)
-- [Create an App](#create-an-app)
-  - [Database Management](#database-management)
-  - [HTTPS](#https)
-  - [Config](#config)
-  - [H5BP](#h5bp)
-- [Remove an App](#remove-an-app)
-- [Uninstall](#uninstall)
-- [Contribute](#contribute)
-- [Contact](#contact)
-
-# Introduction
-
 Hello :wave:
 
 Saber is a tool that allows you to set-up a fully functioning LEMP stack using Docker :whale:
@@ -41,6 +19,25 @@ Each part of the LEMP stack is constructed in a separate container.
 When the application is set-up, you can access your new app by visiting it in your browser at `http://your-site.test`
 
 A self-signed certificate can be assigned to the stack and uses the latest TLS security features.
+
+# Table of Contents
+
+- [Prerequisites](#prerequisites)
+  - [Configuring DNSMasq](#configuring-dnsmasq)
+- [Why Saber?](#why-saber)
+- [Installation](#installation)
+  - [Automatically](#automatically)
+  - [Manually](#manually)
+  - [Available installation options](#available-installation-options)
+- [Create an App](#create-an-app)
+  - [Database Management](#database-management)
+  - [HTTPS](#https)
+  - [Config](#config)
+  - [H5BP](#h5bp)
+- [Remove an App](#remove-an-app)
+- [Uninstall](#uninstall)
+- [Contribute](#contribute)
+- [Contact](#contact)
 
 ## Prerequisites
 
@@ -123,47 +120,14 @@ Saber puts customisation ahead of speed when it comes to creating a new developm
 
 # Installation
 
-The installation consists of moving all files into `~/.config/saber`.
+`composer global require cjmellor/saber`
 
-The `saber` executable is symlinked to `/usr/local/bin` for global usage.
+if you want to run it on a per-project basis, run
 
-There are two methods for installing Saber:
-
-## Method #1
-
-First, you need to install the package.
-
-```shell
-composer create-project cjmellor/saber <target-directory>
+```zsh
+cd /to/your/path
+composer require cjmellor/saber
 ```
-
-`cd` to the target directory then run
-
-```shell
-./saber install
-```
-
-## Method #2
-
-Clone the repo
-
-```shell
-git clone git@github.com:cjmellor/saber.git
-```
-
-Install using the command
-
-```shell
-./saber install
-```
-
-and get the dependencies
-
-```shell
-composer update
-```
-
-The Saber executable will then be available globally.
 
 ## Available installation options
 
@@ -216,7 +180,7 @@ This will create a self-signed certificate. Using the latest security protocols,
 
 Each app created with Saber is configurable. You can enable or disable features that matter to you and how you want your environment setup.
 
-When a new app is created, all the NGINX and PHP config is stored in a `lemp` folder within' the root (`~/.config/saber`)
+When a new app is created, all the NGINX and PHP config is stored in a `lemp` folder within' the root
 
 The NGINX config for each app can be found in:
 

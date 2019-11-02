@@ -12,37 +12,7 @@ class Config
         $this->file = $file;
         $this->cli = $cli;
     }
-
-    /**
-     * Perform all required actions needed before installation takes place.
-     *
-     * @return void
-     */
-    public function preInstall()
-    {
-        if ($this->file->fileExists('/usr/local/bin/saber')) {
-            throw new \Exception('Saber is already installed!');
-
-            return false;
-        }
-
-        if (! $this->file->folderExists(SABER_HOME_CONFIG_PATH)) {
-            $this->file->createDirectory(SABER_HOME_CONFIG_PATH);
-            $this->file->createSaberStructure();
-            $this->symLinkSaber();
-        }
-    }
-
-    /**
-     * Symlink the Saber executable to be used globally.
-     *
-     * @return void
-     */
-    public function symLinkSaber()
-    {
-        $this->cli->run('ln -s ' . SABER_HOME_CONFIG_PATH . '/saber /usr/local/bin');
-    }
-
+    
     /**
      * Let's the user supply the PHP version they want to use.
      *
