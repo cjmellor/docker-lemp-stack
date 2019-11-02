@@ -2,7 +2,7 @@
 
 use Illuminate\Container\Container;
 
-class Facade
+class Facades
 {
     /**
      * The key for the binding in the container.
@@ -29,19 +29,19 @@ class Facade
     }
 }
 
-class Docker extends Facade
+class Docker extends Facades
 {
 }
-class Shell extends Facade
+class Shell extends Facades
 {
 }
-class File extends Facade
+class File extends Facades
 {
 }
-class Config extends Facade
+class Config extends Facades
 {
 }
-class Site extends Facade
+class App extends Facades
 {
 }
 class Secure extends Facade

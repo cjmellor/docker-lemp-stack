@@ -64,7 +64,7 @@ class Docker
      */
     public function dockerCompose($cmd)
     {
-        $this->cli->run('docker-compose -f ~/.config/saber/docker-compose.yml ' . $cmd, function ($errorCode, $errorMsg) {
+        $this->cli->run('docker-compose -f ' . SABER_HOME_CONFIG_PATH . '/docker-compose.yml ' .$cmd, function ($errorCode, $errorMsg) {
             error($errorMsg);
         });
     }

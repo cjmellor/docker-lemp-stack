@@ -32,25 +32,6 @@ class File
     }
 
     /**
-     * Delete the saber config files
-     *
-     * @param string $folderName
-     * @return void
-     */
-    public function removeSaberStructure($folderName)
-    {
-        if (! $this->folderExists(SABER_HOME_CONFIG_PATH)) {
-            throw new \Exception('Saber is not installed');
-        }
-
-        $this->removeDirectory($folderName);
-
-        unlink('/usr/local/bin/saber');
-
-        success('Saber uninstalled');
-    }
-
-    /**
      * Create a directory
      *
      * @param string $folderName
