@@ -75,7 +75,7 @@ $app->command('new domain [-t|--tls]', function ($domain, $tls) {
 
     // If --tls option is enabled, certificates will be generated.
     if ($tls) {
-        Site::generateCertificate($domain);
+        App::generateCertificate($domain);
     }
 
     // Generate new app configurations.
@@ -83,9 +83,9 @@ $app->command('new domain [-t|--tls]', function ($domain, $tls) {
         ? SABER_HOME_CONFIG_PATH . '/lemp/nginx/config/conf.d/.default-tls.conf'
         : SABER_HOME_CONFIG_PATH . '/lemp/nginx/config/conf.d/.default-no_tls.conf';
 
-    Site::createNginxConfig($domain, $configFile);
+    App::createNginxConfig($domain, $configFile);
 
-    Site::createPhpConfig($domain);
+    App::createPhpConfig($domain);
 
     Docker::restartContainers();
 
@@ -108,16 +108,16 @@ $app->command('remove domain', function ($domain) {
     $domain = $domain . '.test';
 
     // Remove all certificates
-    Site::removeCertificate($domain);
+    App::removeCertificate($domain);
 
     // Remove NGINX configs
-    Site::removeNginxConfig($domain);
+    App::removeNginxConfig($domain);
 
     // Remove PHP config
-    Site::removePhpConfig($domain);
+    App::removePhpConfig($domain);
 
     // Remove the app's code directory
-    Site::removeSiteCodeDirectory($domain);
+    App::removeSiteCodeDirectory($domain);
 
     // Restart containers
     Docker::restartContainers();
