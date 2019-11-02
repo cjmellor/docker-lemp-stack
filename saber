@@ -6,13 +6,17 @@ use function Saber\success;
 use Silly\Application;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
-require __DIR__ . '/vendor/autoload.php';
+if (file_exists(__DIR__ . '/../../autoload.php')) {
+    require __DIR__ . '/../../autoload.php';
+} else {
+    require __DIR__ . '/vendor/autoload.php';
+}
 
 // Start the container
 Container::setInstance(new Container);
 
 // Version of App
-$version = '1.0.0';
+$version = '1.0.4';
 
 $app = new Application('Saber', $version);
 
@@ -31,7 +35,7 @@ $app->command('install [--php=] [--db=]', function ($php = DEFAULT_PHP_VERSION, 
 
     // Get the chosen database version
     Config::selectDatabase($db);
-    
+
     // Pre-installation - moving files to where they need to be
     Config::preInstall();
 
