@@ -30,12 +30,17 @@ class Facade
 }
 
 class Docker extends Facade
-{ }
+{
+}
 class Shell extends Facade
-{ }
+{
+}
 class File extends Facade
-{ }
+{
+}
 class Config extends Facade
-{ }
+{
+}
 class App extends Facade
-{ }
+{
+}
