@@ -39,8 +39,8 @@ $app->command('install [--php=] [--db=]', function ($php = DEFAULT_PHP_VERSION, 
     // Build the containers
     Docker::buildContainers();
 })->descriptions('Installs Saber', [
-  '--php' => 'Select the version of PHP you want installed',
-  '--db' => 'Select which database you want installed.'
+    '--php' => 'Select the version of PHP you want installed',
+    '--db' => 'Select which database you want installed.'
 ]);
 
 /**
@@ -59,7 +59,7 @@ $app->command('uninstall', function ($input, $output) {
 /**
  * Create a new application
  */
-$app->command('new domain [-t|--tls]', function ($domain, $tls) {
+$app->command('new domain [-t|--tls]', function (string $domain, $tls) {
 
   // The TLD is added automatically, so no need to write it out yourself
     if (strpos($domain, '.')) {
@@ -87,14 +87,14 @@ $app->command('new domain [-t|--tls]', function ($domain, $tls) {
 
     success('Application built and ready to use!');
 })->descriptions('Creates a new development application environment', [
-  'domain' => 'The name of your app',
-  '--tls' => 'Add TLS certificates for your app'
+    'domain' => 'The name of your app',
+    '--tls' => 'Add TLS certificates for your app'
 ]);
 
 /**
  * Remove an application
  */
-$app->command('remove domain', function ($domain) {
+$app->command('remove domain', function (string $domain) {
     // The TLD is added automatically, so no need to write it out yourself
     if (strpos($domain, '.')) {
         throw new Exception('A domain TLD is not required, this will be added automatically.');
@@ -118,13 +118,13 @@ $app->command('remove domain', function ($domain) {
     // Restart containers
     Docker::restartContainers();
 })->descriptions('Remove a development environment', [
-  'domain' => 'The name of the app you want to remove'
+    'domain' => 'The name of the app you want to remove'
 ]);
 
 /**
  * Secure a non-secure site
  */
-$app->command('secure domain', function ($domain) {
+$app->command('secure domain', function (string $domain) {
     // Check if the site is already secure
     Secure::checkSecureStatus($domain);
 
@@ -138,13 +138,13 @@ $app->command('secure domain', function ($domain) {
     // Restart containers
     Docker::restartContainers();
 })->descriptions('Applies a certificate to the app', [
-  'domain' => 'The name of the app your want to secure'
+    'domain' => 'The name of the app your want to secure'
 ]);
 
 /**
  * Make's a site unsecure
  */
-$app->command('unsecure domain', function ($domain) {
+$app->command('unsecure domain', function (string $domain) {
     // Check if the site exists
     Secure::checkSecureStatus($domain, true);
 
@@ -158,7 +158,18 @@ $app->command('unsecure domain', function ($domain) {
     // Restart containers
     Docker::restartContainers();
 })->descriptions('Removes the certificate for the app', [
-  'domain' => 'The name of the app your want to unsecure'
-]);;
+    'domain' => 'The name of the app your want to unsecure'
+]);
+
+/**
+ * Switch PHP versions
+ */
+$app->command('use php-version', function ($phpVersion) {
+    Config::selectPhpVersion($phpVersion);
+
+    Docker::buildContainers();
+})->descriptions('Switche PHP versions', [
+    'php-version' => 'The version of PHP to switch to. Format: "7.3"'
+]);
 
 $app->run();
