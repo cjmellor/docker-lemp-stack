@@ -164,12 +164,13 @@ $app->command('unsecure domain', function (string $domain) {
 /**
  * Switch PHP versions
  */
-$app->command('use php-version', function ($phpVersion) {
-    Config::selectPhpVersion($phpVersion);
+$app->command('use php-version [-f|--force]', function ($phpVersion, $force) {
+    Config::selectPhpVersion($phpVersion, $force);
 
     Docker::buildContainers();
 })->descriptions('Switche PHP versions', [
-    'php-version' => 'The version of PHP to switch to. Format: "7.3"'
+    'php-version' => 'The version of PHP to switch to. Format: "7.3"',
+    '--force' => 'Install un-supported versions of PHP'
 ]);
 
 $app->run();

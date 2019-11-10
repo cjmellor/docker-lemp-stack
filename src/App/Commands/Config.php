@@ -19,9 +19,9 @@ class Config
      * @param int $phpVersion
      * @return void
      */
-    public function selectPhpVersion($phpVersion)
+    public function selectPhpVersion($phpVersion, $force = false)
     {
-        if (! $this->checkValidVersion($phpVersion)) {
+        if (! $this->checkValidVersion($phpVersion, $force)) {
             error('Invalid PHP version');
         }
 
@@ -36,12 +36,14 @@ class Config
      * @param float $phpVersion
      * @return bool
      */
-    public function checkValidVersion($phpVersion)
+    public function checkValidVersion($phpVersion, $force = false)
     {
-        $validVersions = [7.2, 7.3];
+        if (! $force) {
+            $validVersions = [7.2, 7.3];
 
-        if (! in_array($phpVersion, $validVersions)) {
-            return false;
+            if (! in_array($phpVersion, $validVersions)) {
+                return false;
+            }
         }
 
         return true;
