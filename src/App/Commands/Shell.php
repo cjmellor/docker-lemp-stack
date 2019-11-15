@@ -13,9 +13,9 @@ class Shell
      * @param callable $error
      * @return void
      */
-    public function run($command, callable $error = null)
+    public function run($command, callable $error = null, $verbose = false)
     {
-        return $this->runCommand($command, $error);
+        return $this->runCommand($command, $error, $verbose);
     }
 
     /**
@@ -25,13 +25,17 @@ class Shell
      * @param callable $error
      * @return void
      */
-    public function runCommand($command, callable $error = null)
+    public function runCommand($command, callable $error = null, $verbose = false)
     {
         $process = Process::fromShellCommandline($command);
 
         $shellOutput = '';
 
-        $process->setTimeout(null)->run(function ($type, $line) use (&$shellOutput) {
+        $process->setTimeout(null)->run(function ($type, $line) use (&$shellOutput, $verbose) {
+            if ($verbose) {
+                echo $line;
+            }
+
             $shellOutput .= $line;
         });
 

@@ -23,6 +23,7 @@ class Config
     {
         if (! $this->checkValidVersion($phpVersion, $force)) {
             error('Invalid PHP version');
+            exit;
         }
 
         replace('PHP_VERSION=(.+)|PHP_VERSION=', 'PHP_VERSION=' . ($phpVersion ?: DEFAULT_PHP_VERSION), '.env');

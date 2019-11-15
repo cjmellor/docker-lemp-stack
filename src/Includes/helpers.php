@@ -21,7 +21,7 @@ function replace($original, $new, $filename)
 {
     $file = preg_replace('/' . $original . '/', $new, file_get_contents($filename));
 
-    (new Filesystem)->dumpFile($filename, $file);
+    (new Filesystem())->dumpFile($filename, $file);
 }
 
 /**
@@ -55,8 +55,6 @@ function info($output)
 function error($output)
 {
     output("<error>$output</error>");
-
-    exit(1);
 }
 
 /**
@@ -66,5 +64,21 @@ function error($output)
  */
 function output($output)
 {
-    return (new ConsoleOutput)->writeln($output);
+    return (new ConsoleOutput())->writeln($output);
+}
+
+/**
+ * Check if a string is contained within' another string
+ *
+ * @param string $haystack
+ * @param string $needle
+ * @return bool
+ */
+function contains($haystack, $needle)
+{
+    if (strpos($haystack, $needle) !== false) {
+        return true;
+    }
+
+    return false;
 }

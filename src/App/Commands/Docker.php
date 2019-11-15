@@ -2,6 +2,8 @@
 
 namespace Saber;
 
+use Symfony\Component\Process\Process;
+
 class Docker
 {
     public $cli;
@@ -9,6 +11,7 @@ class Docker
     /**
      * Create new Docker instance
      *
+     * @param boolean $verbose
      * @param Shell $cli
      */
     public function __construct(Shell $cli)
@@ -19,13 +22,14 @@ class Docker
     /**
      * Build the Docker containers
      *
+     * @param boolean $verbose
      * @return void
      */
-    public function buildContainers()
+    public function buildContainers($verbose = false)
     {
-        info('Building your application environment...');
+        info('Building your application...');
 
-        $this->dockerCompose('up -d --build');
+        $this->dockerCompose('up -d --build', $verbose ?? true);
 
         success('Containers successfully built!');
     }
@@ -33,13 +37,14 @@ class Docker
     /**
      * Restarts Docker containers
      *
+     * @param boolean $verbose
      * @return void
      */
-    public function restartContainers()
+    public function restartContainers($verbose = false)
     {
         info('Restarting containers...');
 
-        $this->dockerCompose('restart php nginx');
+        $this->dockerCompose('restart php nginx', $verbose ?? true);
 
         success('Containers restarted!');
     }
@@ -47,25 +52,148 @@ class Docker
     /**
      * Destroys Docker containers
      *
+     * @param boolean $verbose
      * @return void
      */
-    public function destroyContainers()
+    public function destroyContainers($verbose = false)
     {
         info('Shutting down containers...');
 
-        $this->dockerCompose('down -v');
+        $this->dockerCompose('down --rmi all', $verbose ?? true);
+
+        success('Containers removed ✅');
+    }
+
+    /**
+     * Run a Docker command
+     *
+     * @param string $cmd
+     * @param boolean $verbose
+     * @return void
+     */
+    public function docker($cmd, $verbose = false)
+    {
+        return $this->cli->run(
+            'docker ' . $cmd,
+            function ($errorCode, $errorMsg) {
+                error($errorMsg);
+            },
+            $verbose
+        );
     }
 
     /**
      * Run a docker-compose command
      *
      * @param string $cmd
+     * @param boolean $verbose
      * @return void
      */
-    public function dockerCompose($cmd)
+    public function dockerCompose($cmd, $verbose = false)
     {
-        $this->cli->run('docker-compose -f ' . SABER_HOME_CONFIG_PATH . '/docker-compose.yml ' .$cmd, function ($errorCode, $errorMsg) {
-            error($errorMsg);
+        // If errors, remove 'return'
+        return $this->cli->run(
+            'docker-compose -f ' . SABER_HOME_CONFIG_PATH . '/docker-compose.yml ' . $cmd,
+            function ($errorCode, $errorMsg) {
+                error($errorMsg);
+            },
+            $verbose
+        );
+    }
+
+    /**
+     * List all downloaded Docker images
+     *
+     * @return array
+     */
+    public function listImages(): array
+    {
+        $images = $this->docker("images --format '\"{{.Repository}}:{{.Tag}}\"' --filter=reference='*' | jq -r");
+
+        $image = explode("\n", substr($images, 0, -1));
+
+        return $image;
+    }
+
+    /**
+     * Upgrade a Docker image
+     *
+     * @param array $images
+     * @return void
+     */
+    public function upgradeImages($images)
+    {
+        $this->pull($images);
+
+        // Clean up unused images
+        $this->clean();
+
+        // Shut down the containters
+        $this->destroyContainers();
+
+        // Re-build new containers
+        $this->buildContainers();
+    }
+
+    /**
+     * Prune dangling Docker images
+     *
+     * @return void
+     */
+    public function clean()
+    {
+        return $this->docker('image prune --force');
+    }
+
+    /**
+     * Pull the latest contaier image
+     *
+     * @param string $image
+     * @return void
+     */
+    public function pull($images)
+    {
+        // Count how many containers will be attempted to be updated
+        $countImages = count($images);
+
+        info("Updrading $countImages containers...");
+
+        foreach ($images as $key => $image) {
+            $key = $key + 1;
+            $newVersion = $this->isNewVersion($image);
+
+            // If their's a new version of the container, upgrade it
+            if ($newVersion) {
+                info("($key/$countImages) Upgrading '$image'");
+
+                $this->docker('pull ' . $image);
+
+                success("'$image' upgraded\n");
+            }
+
+            // Images are up to date! Nothing more to do
+            success("'$image' is at the latest version ✅");
+        }
+    }
+
+    /**
+     * Check if a new version of a container image is available
+     *
+     * @param string $image
+     * @return bool
+     */
+    public function isNewVersion($image)
+    {
+        $cmdOutput = (new Process($this->docker('pull ' . $image)));
+        $cmdOutput->start();
+
+        $cmdOutput->wait(function ($type, $buffer) {
+            if (contains($buffer, 'Image is up to date')) {
+                return false;
+                exit;
+            }
+
+            return true;
         });
     }
 }

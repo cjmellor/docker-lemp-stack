@@ -1,5 +1,7 @@
 <?php
 
+namespace Saber;
+
 use Illuminate\Container\Container;
 
 class Facades
