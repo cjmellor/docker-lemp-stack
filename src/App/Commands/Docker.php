@@ -121,10 +121,54 @@ class Docker
      * @param array $images
      * @return void
      */
-    public function upgradeImages($images)
+    public function upgradeImages($images, $verbose = false)
     {
-        $this->pull($images);
+        $imagesUpdated = $this->pull($images, $verbose ?? true);
 
+        if ($imagesUpdated > 0) {
+            $this->rebuild();
+        }
+    }
+
+    /**
+     * Pull the latest contaier image
+     *
+     * @param string $image
+     * @return void
+     */
+    public function pull($images, $verbose = false)
+    {
+        // Count how many containers will be attempted to be updated
+        $countImages = count($images);
+        $imagesUpdated = 0;
+
+        info("Updrading $countImages containers...");
+
+        foreach ($images as $key => $image) {
+            $key = $key + 1;
+
+            // Is there a new version of the image?
+            if (! $this->isNewVersion($image)) {
+                info("($key/$countImages) Getting latest image of '$image'");
+
+                $this->docker('pull ' . $image, $verbose ?? true);
+
+                $imagesUpdated++;
+            } else {
+                success("'$image' is at the latest version ✅");
+            }
+        }
+
+        return $imagesUpdated;
+    }
+
+    /**
+     * Re-build the containers - done after an image upgrade
+     *
+     * @return void
+     */
+    public function rebuild()
+    {
         // Clean up unused images
         $this->clean();
 
@@ -146,37 +190,6 @@ class Docker
     }
 
     /**
-     * Pull the latest contaier image
-     *
-     * @param string $image
-     * @return void
-     */
-    public function pull($images)
-    {
-        // Count how many containers will be attempted to be updated
-        $countImages = count($images);
-
-        info("Updrading $countImages containers...");
-
-        foreach ($images as $key => $image) {
-            $key = $key + 1;
-            $newVersion = $this->isNewVersion($image);
-
-            // If their's a new version of the container, upgrade it
-            if ($newVersion) {
-                info("($key/$countImages) Upgrading '$image'");
-
-                $this->docker('pull ' . $image);
-
-                success("'$image' upgraded\n");
-            }
-
-            // Images are up to date! Nothing more to do
-            success("'$image' is at the latest version ✅");
-        }
-    }
-
-    /**
      * Check if a new version of a container image is available
      *
      * @param string $image
@@ -190,7 +203,6 @@ class Docker
         $cmdOutput->wait(function ($type, $buffer) {
             if (contains($buffer, 'Image is up to date')) {
                 return false;
-                exit;
             }
 
             return true;
