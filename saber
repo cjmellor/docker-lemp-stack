@@ -28,7 +28,7 @@ $app = new Application('Saber', $version);
 /**
  * Installs Saber
  */
-$app->command('install [--php=] [--db=]', function ($php = DEFAULT_PHP_VERSION, $db = DEFAULT_DATABASE_IMAGE) {
+$app->command('install [--php=] [--db=]', function ($php = DEFAULT_PHP_VERSION, $db = DEFAULT_DATABASE_IMAGE, InputInterface $input) {
     // First, copy the .env.example file
     if (! File::fileExists('.env')) {
         File::copyFile('.env.example', '.env');
@@ -41,7 +41,7 @@ $app->command('install [--php=] [--db=]', function ($php = DEFAULT_PHP_VERSION, 
     Config::selectDatabase($db);
 
     // Build the containers
-    Docker::buildContainers();
+    Docker::buildContainers($input->getOption('verbose'));
 })->descriptions('Installs Saber', [
     '--php' => 'Select the version of PHP you want installed',
     '--db' => 'Select which database you want installed.'
