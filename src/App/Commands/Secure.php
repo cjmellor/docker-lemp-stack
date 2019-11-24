@@ -11,8 +11,9 @@ class Secure
      * Secure configuration class instance
      *
      * @param File $file
+     * @param App $site
      */
-    public function __construct(File $file, Site $site)
+    public function __construct(File $file, App $site)
     {
         $this->file = $file;
         $this->site = $site;
@@ -30,7 +31,7 @@ class Secure
     {
         $sitePath = SABER_HOME_CONFIG_PATH . "/lemp/nginx/config/conf.d/{$domain}.conf";
 
-        if ($this->file->fileExists($this->certPath . "{$domain}.crt") && (!$unsecure == true)) {
+        if ($this->file->fileExists($this->certPath . "{$domain}.crt") && (! $unsecure === true)) {
             throw new \Exception('The site is already secure.');
         }
 
