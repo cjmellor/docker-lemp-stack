@@ -71,14 +71,15 @@ function output($output)
  * Check if a string is contained within' another string
  *
  * @param string $haystack
- * @param string $needle
+ * @param string|array $needles
  * @return bool
  */
-function contains($haystack, $needle)
+function contains($haystack, $needles)
 {
-    if (strpos($haystack, $needle) !== false) {
-        return true;
+    foreach ((array) $needles as $needle) {
+        if ($needle !== '' && mb_strpos($haystack, $needle) !== false) {
+            return true;
+        }
     }
-
     return false;
 }
