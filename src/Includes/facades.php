@@ -44,3 +44,6 @@ class Config extends Facades
 class App extends Facades
 {
 }
+class Secure extends Facades
+{
+}

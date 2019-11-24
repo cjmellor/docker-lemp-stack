@@ -12,22 +12,42 @@ class Config
         $this->file = $file;
         $this->cli = $cli;
     }
-    
+
     /**
      * Let's the user supply the PHP version they want to use.
      *
-     * @param int $php_version
+     * @param int $phpVersion
      * @return void
      */
-    public function selectPhpVersion($php_version)
+    public function selectPhpVersion($phpVersion, $force = false)
     {
-        if (! preg_match('/(\d\.)?(\d\.)?(\d{1,2})/', $php_version, $match)) {
+        if (! $this->checkValidVersion($phpVersion, $force)) {
             error('Invalid PHP version');
+            exit;
         }
 
-        replace('PHP_VERSION=(.+)|PHP_VERSION=', 'PHP_VERSION=' . ($match[0] ?: DEFAULT_PHP_VERSION), '.env');
+        replace('PHP_VERSION=(.+)|PHP_VERSION=', 'PHP_VERSION=' . ($phpVersion ?: DEFAULT_PHP_VERSION), '.env');
 
-        info("Installing PHP version: <fg=white>$php_version</>");
+        info("Installing PHP version: <fg=white>$phpVersion</>");
+    }
+
+    /**
+     * Check if the supplied version of PHP is valid
+     *
+     * @param float $phpVersion
+     * @return bool
+     */
+    public function checkValidVersion($phpVersion, $force = false)
+    {
+        if (! $force) {
+            $validVersions = [7.2, 7.3];
+
+            if (! in_array($phpVersion, $validVersions)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -79,17 +99,13 @@ class Config
     {
         // List of current stable and supported versions
         $valid_db_versions = [
-            '5.6', '5.7', '8.0', '10.1', '10.2', '10.3',
+            '5.6', '5.7', '8.0', '10.1', '10.2', '10.3', 'latest',
         ];
 
-        if (is_numeric($version)) {
-            if (! preg_match('/^(\d{1,2})(\.)?(\d)$/', $version) or (! in_array($version, $valid_db_versions, true))) {
-                error("Invalid DB version\n\nAvailable versions:\n\n - MySQL: 5.6, 5.7, 8.0\n - MariaDB: 10.1, 10.2, 10.3");
-            }
+        if (! in_array($version, $valid_db_versions, true)) {
+            error("Invalid DB version\n\nAvailable versions:\n\n - MySQL: 5.6, 5.7, 8.0\n - MariaDB: 10.1, 10.2, 10.3");
 
-            return true;
-        } elseif ($version != 'latest') {
-            error("Invalid input: \"$version\"\n\n - Did you mean 'latest'?");
+            return false;
         }
 
         return true;

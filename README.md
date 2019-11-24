@@ -12,9 +12,9 @@ saber new your-site
 
 Each part of the LEMP stack is constructed in a separate container.
 
-- NGINX
-- PHP
-- MySQL / MariaDB
+-   NGINX
+-   PHP
+-   MySQL / MariaDB
 
 When the application is set-up, you can access your new app by visiting it in your browser at `http://your-site.test`
 
@@ -22,29 +22,30 @@ A self-signed certificate can be assigned to the stack and uses the latest TLS s
 
 # Table of Contents
 
-- [Prerequisites](#prerequisites)
-  - [Configuring DNSMasq](#configuring-dnsmasq)
-- [Why Saber?](#why-saber)
-- [Installation](#installation)
-  - [Automatically](#automatically)
-  - [Manually](#manually)
-  - [Available installation options](#available-installation-options)
-- [Create an App](#create-an-app)
-  - [Database Management](#database-management)
-  - [HTTPS](#https)
-  - [Config](#config)
-  - [H5BP](#h5bp)
-- [Remove an App](#remove-an-app)
-- [Uninstall](#uninstall)
-- [Contribute](#contribute)
-- [Contact](#contact)
+-   [Prerequisites](#prerequisites)
+    -   [Configuring DNSMasq](#configuring-dnsmasq)
+-   [Why Saber?](#why-saber)
+-   [Installation](#installation)
+    -   [Available installation options](#available-installation-options)
+-   [Create an App](#create-an-app)
+    -   [Database Management](#database-management)
+    -   [HTTPS](#https)
+    -   [Config](#config)
+    -   [H5BP](#h5bp)
+-   [Secure an App](#secure-an-app)
+-   [Remove an App](#remove-an-app)
+-   [Switch PHP Versions](#switch-php-versions)
+-   [Upgrade](#upgrade)
+-   [Uninstall](#uninstall)
+-   [Contribute](#contribute)
+-   [Contact](#contact)
 
 ## Prerequisites
 
-- MacOS
-- [Docker / Docker Compose](https://hub.docker.com/editions/community/docker-ce-desktop-mac)
-- [Homebrew](https://brew.sh/)
-- DNSMasq
+-   MacOS
+-   [Docker / Docker Compose](https://hub.docker.com/editions/community/docker-ce-desktop-mac)
+-   [Homebrew](https://brew.sh/)
+-   DNSMasq
 
 ## Configuring DNSMasq
 
@@ -139,7 +140,7 @@ composer require cjmellor/saber
 # Create an App
 
 ```shell
-saber new my-site
+saber new <app-domain>
 ```
 
 Creating an app will spin up the Dockerized LEMP stack.
@@ -169,12 +170,12 @@ mysql -h 127.0.0.1 -P 3306 -u root -p
 Without specifying otherwise, the application will be unsecure (`http`). If you want to run the app more securely, when creating your app, specify the `--tls` tag
 
 ```shell
-saber new my-secure-site --tls
+saber new <app-domain> --tls
 ```
 
 This will create a self-signed certificate. Using the latest security protocols, the application can run on the latest version of TLS (1.3).
 
-**Currently there is no way to switch SSL's on or off, they must be added on the creation of a new app. This will be rectified in newer versions - PR's welcome!**
+You can [secure or unsecure an app](#secure-an-app) by using the native commands available in Saber.
 
 ## Configuration
 
@@ -184,11 +185,11 @@ When a new app is created, all the NGINX and PHP config is stored in a `lemp` fo
 
 The NGINX config for each app can be found in:
 
-- `lemp/nginx/config/conf.d/`
+-   `lemp/nginx/config/conf.d/`
 
 The PHP config for each app can be found in:
 
-- `lemp/php/config`
+-   `lemp/php/config`
 
 > Don't forget to restart the containers if you make changes to these files
 
@@ -199,12 +200,80 @@ Saber utilises the awesome [H5BP](https://github.com/h5bp/server-configs-nginx) 
 # Remove an App
 
 ```shell
-saber remove app-name
+saber remove <app-domain>
 ```
 
 You can remove an app if you no longer require it.
 
 This will remove the certificates, the PHP and NGINX configurations and the code folder.
+
+# Switch PHP Versions
+
+```shell
+saber use 7.3
+```
+
+Using the `use` command you can switch PHP versions easily!
+
+By default, Saber encourages you to use stable versions of PHP. You can overwrite this by supplying a `--force` option that will allow you to use other PHP versions.
+
+Example:
+
+```shell
+saber use --force 5.6.40
+
+saber use -f 7.4.0RC6-fpm
+```
+
+# Secure an App
+
+```shell
+saber secure <app-domain>
+```
+
+By default, apps aren't secure - they're running on `HTTP`. If you want your app to run over `HTTPS` you can run the `secure` command which will assign an SSL certificate to your app.
+
+> The SSL certificates are self-signed.
+
+If you added an SSL on creation of your app, or you made a mistake and want to start over, you can perform the reverse of this and remove an SSL certificate
+
+```shell
+saber unsecure <app-domain>
+```
+
+# Upgrade
+
+The images used to build your environment are often updated by the maintainers of the image, resulting in newer versions and secrity fixes. Normally to upgrade a version of PHP or MySQL it would take many hours to upgrade it manually or lots of tedious tickets or phone calls with your hosting provider.
+
+Saber will pull down the newest versions of the images you want to upgrade and rebuild the containers.
+
+```shell
+saber upgrade
+```
+
+Run the upgrade command, and you'll be presented with a list of images stored locally on your machine
+
+```shell
+Select images to upgrade. Select multiple by seperating with a commar, example: 1,3
+  [0] composer:latest
+  [1] php:7.2-fpm-alpine
+  [2] php:7.3-fpm-alpine
+  [3] nginx:alpine
+  [4] mariadb:latest
+ >
+```
+
+Choose the image you want to update by typing the corrosponding number and the image will be pulled down and the containers will be rebuilt.
+
+If you want update multiple images, select the image number in a commar separated value, e.g.
+
+```shell
+> 2,3,4
+```
+
+and those images will be updated.
+
+> Images cannot be updated simultaneously, they will be pulled one at a time before been rebuilt
 
 # Uninstall
 
