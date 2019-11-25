@@ -79,14 +79,19 @@ class Config
         // If user doesn't choose 'mariadb' or 'mysql'
         if (! in_array($db_version[0], $db_options, true)) {
             error('Invalid database');
+            exit;
         }
 
         // If no version of the databases is provided
         if (strpos($database_image, ':') === false) {
             error('No version tag provided');
+            exit;
         }
 
-        $this->isVersionValid($db_version[1]);
+        if (! $this->isVersionValid($db_version[1])) {
+            error("Invalid DB version\n\nAvailable versions:\n\n - MySQL: 5.6, 5.7, 8.0\n - MariaDB: 10.1, 10.2, 10.3");
+            exit;
+        }
     }
 
     /**
@@ -103,8 +108,6 @@ class Config
         ];
 
         if (! in_array($version, $valid_db_versions, true)) {
-            error("Invalid DB version\n\nAvailable versions:\n\n - MySQL: 5.6, 5.7, 8.0\n - MariaDB: 10.1, 10.2, 10.3");
-
             return false;
         }
 
