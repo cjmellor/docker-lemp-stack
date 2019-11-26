@@ -30,8 +30,8 @@ $app = new Application('Saber', $version);
  */
 $app->command('install [--php=] [--db=]', function ($php = DEFAULT_PHP_VERSION, $db = DEFAULT_DATABASE_IMAGE, InputInterface $input) {
     // First, copy the .env.example file
-    if (! File::fileExists('.env')) {
-        File::copyFile('.env.example', '.env');
+    if (! File::fileExists(SABER_HOME_CONFIG_PATH . '/.env')) {
+        File::copyFile(SABER_HOME_CONFIG_PATH . '/.env.example', SABER_HOME_CONFIG_PATH . '/.env');
     }
 
     // Get the chosen PHP version
