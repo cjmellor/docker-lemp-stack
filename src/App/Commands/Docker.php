@@ -148,7 +148,7 @@ class Docker
             $key = $key + 1;
 
             // Is there a new version of the image?
-            if (! $this->isNewVersion($image)) {
+            if ($this->isNewVersion($image)) {
                 info("($key/$countImages) Getting latest image of '$image'");
 
                 $this->docker('pull ' . $image, $verbose ?? true);

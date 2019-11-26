@@ -26,7 +26,7 @@ class Config
             exit;
         }
 
-        replace('PHP_VERSION=(.+)|PHP_VERSION=', 'PHP_VERSION=' . ($phpVersion ?: DEFAULT_PHP_VERSION), '.env');
+        replace('PHP_VERSION=(.+)|PHP_VERSION=', 'PHP_VERSION=' . ($phpVersion ?: DEFAULT_PHP_VERSION), SABER_HOME_CONFIG_PATH . '/.env');
 
         info("Installing PHP version: <fg=white>$phpVersion</>");
     }
@@ -60,7 +60,7 @@ class Config
     {
         $this->validateDatabase($database_image);
 
-        replace('DATABASE_NAME=(.+)|DATABASE_NAME=', 'DATABASE_NAME=' . ($database_image ?: DEFAULT_DATABASE_IMAGE), '.env');
+        replace('DATABASE_NAME=(.+)|DATABASE_NAME=', 'DATABASE_NAME=' . ($database_image ?: DEFAULT_DATABASE_IMAGE), SABER_HOME_CONFIG_PATH . '/.env');
 
         info("Installing database: <fg=white>$database_image</>");
     }
