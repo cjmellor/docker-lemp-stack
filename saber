@@ -21,7 +21,7 @@ if (file_exists(__DIR__ . '/../../autoload.php')) {
 Container::setInstance(new Container());
 
 // Version of App
-$version = '1.1.1';
+$version = '1.1.2';
 
 $app = new Application('Saber', $version);
 
