@@ -7,7 +7,7 @@ Saber is a tool that allows you to set-up a fully functioning LEMP stack using D
 Just a single command to run and you're up and running!
 
 ```shell
-saber new your-site
+saber new <app-domain>
 ```
 
 Each part of the LEMP stack is constructed in a separate container.
@@ -130,11 +130,23 @@ cd /to/your/path
 composer require cjmellor/saber
 ```
 
+Now run the `install` command to install Saber onto your system. You can choose a PHP and Database version on install, or just omit the options
+
+```zsh
+saber install
+```
+
+or with options
+
+```zsh
+saber install --php=7.4 --db=mysql:8.0
+```
+
 ## Available installation options
 
 | Option | Default        | Description                                            |
 | ------ | -------------- | ------------------------------------------------------ |
-| php    | 7.2            | Just a version number (e.g. _5.6_, _7.4_)              |
+| php    | 7.3            | Just a version number (e.g. _5.6_, _7.4_)              |
 | db     | mariadb:latest | _db:version_ (e.g. _mysql:5.7_). `latest` also allowed |
 
 # Create an App
