@@ -30,7 +30,7 @@ $app = new Application('Saber', $version);
  */
 $app->command('install [--php=] [--db=]', function ($php = DEFAULT_PHP_VERSION, $db = DEFAULT_DATABASE_IMAGE, InputInterface $input) {
     // First, copy the .env.example file
-    if (! File::fileExists(SABER_HOME_CONFIG_PATH . '/.env')) {
+    if (!File::fileExists(SABER_HOME_CONFIG_PATH . '/.env')) {
         File::copyFile(SABER_HOME_CONFIG_PATH . '/.env.example', SABER_HOME_CONFIG_PATH . '/.env');
     }
 
@@ -65,7 +65,7 @@ $app->command('uninstall', function ($input, $output) {
  */
 $app->command('new domain [-t|--tls]', function (string $domain, $tls, InputInterface $input) {
 
-  // The TLD is added automatically, so no need to write it out yourself
+    // The TLD is added automatically, so no need to write it out yourself
     if (strpos($domain, '.')) {
         throw new Exception('A domain TLD is not required, this will be added automatically.');
     }
@@ -80,8 +80,8 @@ $app->command('new domain [-t|--tls]', function (string $domain, $tls, InputInte
 
     // Generate new app configurations.
     $configFile = ($tls)
-    ? SABER_HOME_CONFIG_PATH . '/lemp/nginx/config/conf.d/.default-tls.conf'
-    : SABER_HOME_CONFIG_PATH . '/lemp/nginx/config/conf.d/.default-no_tls.conf';
+        ? SABER_HOME_CONFIG_PATH . '/lemp/nginx/config/conf.d/.default-tls.conf'
+        : SABER_HOME_CONFIG_PATH . '/lemp/nginx/config/conf.d/.default-no_tls.conf';
 
     App::createNginxConfig($domain, $configFile);
 
