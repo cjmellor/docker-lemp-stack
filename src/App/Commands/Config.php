@@ -21,7 +21,7 @@ class Config
      */
     public function selectPhpVersion($phpVersion, $force = false)
     {
-        if (! $this->checkValidVersion($phpVersion, $force)) {
+        if (!$this->checkValidVersion($phpVersion, $force)) {
             error('Invalid PHP version');
             exit;
         }
@@ -39,10 +39,10 @@ class Config
      */
     public function checkValidVersion($phpVersion, $force = false)
     {
-        if (! $force) {
-            $validVersions = [7.2, 7.3];
+        if (!$force) {
+            $validVersions = [7.2, 7.3, 7.4];
 
-            if (! in_array($phpVersion, $validVersions)) {
+            if (!in_array($phpVersion, $validVersions)) {
                 return false;
             }
         }
@@ -77,7 +77,7 @@ class Config
         $db_version = explode(':', $database_image);
 
         // If user doesn't choose 'mariadb' or 'mysql'
-        if (! in_array($db_version[0], $db_options, true)) {
+        if (!in_array($db_version[0], $db_options, true)) {
             error('Invalid database');
             exit;
         }
@@ -88,7 +88,7 @@ class Config
             exit;
         }
 
-        if (! $this->isVersionValid($db_version[1])) {
+        if (!$this->isVersionValid($db_version[1])) {
             error("Invalid DB version\n\nAvailable versions:\n\n - MySQL: 5.6, 5.7, 8.0\n - MariaDB: 10.1, 10.2, 10.3");
             exit;
         }
@@ -107,7 +107,7 @@ class Config
             '5.6', '5.7', '8.0', '10.1', '10.2', '10.3', 'latest',
         ];
 
-        if (! in_array($version, $valid_db_versions, true)) {
+        if (!in_array($version, $valid_db_versions, true)) {
             return false;
         }
 
