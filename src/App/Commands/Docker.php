@@ -106,7 +106,7 @@ class Docker
      *
      * @return array
      */
-    public function listImages(): array
+    public function listImages()
     {
         $images = $this->docker("images --format '\"{{.Repository}}:{{.Tag}}\"' --filter=reference='*' | jq -r");
 
