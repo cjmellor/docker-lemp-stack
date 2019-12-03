@@ -31,7 +31,7 @@ class Secure
     {
         $sitePath = SABER_HOME_CONFIG_PATH . "/lemp/nginx/config/conf.d/{$domain}.conf";
 
-        if ($this->file->fileExists($this->certPath . "{$domain}.crt") && (! $unsecure === true)) {
+        if ($this->file->fileExists($this->certPath . "{$domain}.crt") && (!$unsecure === true)) {
             throw new \Exception('The site is already secure.');
         }
 
