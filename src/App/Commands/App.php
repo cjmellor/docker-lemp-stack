@@ -6,7 +6,15 @@ use Exception;
 
 class App
 {
-    public $file;
+    /**
+     * @var Shell
+     */
+    private $cli;
+
+    /**
+     * @var File
+     */
+    private $file;
 
     public function __construct(File $file, Shell $cli)
     {
@@ -17,7 +25,7 @@ class App
     /**
      * Generate a self-signed certificate for the specified domain
      *
-     * @param string $domain
+     * @param  string  $domain
      * @return void
      */
     public function generateCertificate($domain)
@@ -26,12 +34,12 @@ class App
         $this->installMkCert();
 
         // If the 'certs' folder doesn't exist, create it
-        if (!$this->file->folderExists(SABER_HOME_CONFIG_PATH . '/certs')) {
-            $this->file->createDirectory(SABER_HOME_CONFIG_PATH . '/certs');
+        if (!$this->file->folderExists(SABER_HOME_CONFIG_PATH.'/certs')) {
+            $this->file->createDirectory(SABER_HOME_CONFIG_PATH.'/certs');
         }
 
-        $certificateStub = SABER_HOME_CONFIG_PATH . '/lemp/nginx/config/h5bp/ssl/certificate_files.conf';
-        $appCertificate = SABER_HOME_CONFIG_PATH . '/lemp/nginx/config/ssl/' . $domain . '.conf';
+        $certificateStub = SABER_HOME_CONFIG_PATH.'/lemp/nginx/config/h5bp/ssl/certificate_files.conf';
+        $appCertificate = SABER_HOME_CONFIG_PATH.'/lemp/nginx/config/ssl/'.$domain.'.conf';
 
         // Copy the SSL configuration into it's own app location
         $this->file->copyFile($certificateStub, $appCertificate);
@@ -43,17 +51,19 @@ class App
     /**
      * Removes certificate files for a domain
      *
-     * @param string $domain
+     * @param  string  $domain
      * @return void
      */
     public function removeCertificate($domain)
     {
         info('Removing certificates...');
 
-        $this->file->deleteFiles([
-            SABER_HOME_CONFIG_PATH . '/certs/' . $domain . '.crt',
-            SABER_HOME_CONFIG_PATH . '/certs/' . $domain . '-key.key',
-        ]);
+        $this->file->deleteFiles(
+            [
+                SABER_HOME_CONFIG_PATH.'/certs/'.$domain.'.crt',
+                SABER_HOME_CONFIG_PATH.'/certs/'.$domain.'-key.key',
+            ]
+        );
     }
 
     /**
@@ -63,7 +73,7 @@ class App
      */
     public function installMkCert()
     {
-        if (!$this->file->folderExists(getenv('HOME') . '/Library/Application Support/mkcert')) {
+        if (!$this->file->folderExists(getenv('HOME').'/Library/Application Support/mkcert')) {
             info('Installing MKCert...');
             $this->cli->run('brew install mkcert');
             success('MKCert installed!');
@@ -73,14 +83,16 @@ class App
     /**
      * Creates a self-signed certificate for the domain.
      *
-     * @param string $domain
+     * @param  string  $domain
      * @return void
      */
     public function createSelfSignedCertificate($domain)
     {
-        $this->cli->run("mkcert -cert-file " . SABER_HOME_CONFIG_PATH . "/certs/{$domain}.crt -key-file " . SABER_HOME_CONFIG_PATH . "/certs/{$domain}-key.key {$domain}");
+        $this->cli->run(
+            "mkcert -cert-file ".SABER_HOME_CONFIG_PATH."/certs/{$domain}.crt -key-file ".SABER_HOME_CONFIG_PATH."/certs/{$domain}-key.key {$domain}"
+        );
 
-        $appCertificate = SABER_HOME_CONFIG_PATH . '/lemp/nginx/config/ssl/' . $domain . '.conf';
+        $appCertificate = SABER_HOME_CONFIG_PATH.'/lemp/nginx/config/ssl/'.$domain.'.conf';
 
         // Replace default certificate with custom domain.
         replace('localhost', $domain, $appCertificate);
@@ -92,13 +104,14 @@ class App
     /**
      * Creates the NGINX config files
      *
-     * @param string $domain
-     * @param string $config
+     * @param  string  $domain
+     * @param  string  $config
      * @return void
+     * @throws Exception
      */
     public function createNginxConfig($domain, $config)
     {
-        $nginxConfig = SABER_HOME_CONFIG_PATH . '/lemp/nginx/config/conf.d/' . $domain . '.conf';
+        $nginxConfig = SABER_HOME_CONFIG_PATH.'/lemp/nginx/config/conf.d/'.$domain.'.conf';
 
         $this->checkAppExists($domain);
 
@@ -114,14 +127,15 @@ class App
     }
 
     /**
-     * Check and see if an app is aleady been used
+     * Check and see if an app is already been used
      *
-     * @param string $domain
+     * @param  string  $domain
      * @return void
+     * @throws Exception
      */
     public function checkAppExists($domain)
     {
-        if ($this->file->folderExists(SABER_HOME_CONFIG_PATH . '/code/' . $domain)) {
+        if ($this->file->folderExists(SABER_HOME_CONFIG_PATH.'/code/'.$domain)) {
             throw new Exception('Application already exists');
         }
     }
@@ -129,56 +143,56 @@ class App
     /**
      * Creates a folder for the app's public code
      *
-     * @param string $domain
+     * @param  string  $domain
      * @return void
      */
 
     public function createCodeDirectory($domain)
     {
-        $codePath = SABER_HOME_CONFIG_PATH . '/code/' . $domain;
+        $codePath = SABER_HOME_CONFIG_PATH.'/code/'.$domain;
 
         // Create a public folder for app code
         $this->file->createDirectory($codePath);
 
         // Add a HTML file in there to show it's working
-        $this->file->putContent($codePath . '/index.html', "<h1>$domain is up and running!</h1>");
+        $this->file->putContent($codePath.'/index.html', "<h1>$domain is up and running!</h1>");
     }
 
     /**
      * Removes the NGINX config
      *
-     * @param string $domain
+     * @param  string  $domain
      * @return void
      */
     public function removeNginxConfig($domain)
     {
         info('Removing NGINX configuration file...');
 
-        $this->file->deleteFiles(SABER_HOME_CONFIG_PATH . '/lemp/nginx/config/conf.d/' . $domain . '.conf');
+        $this->file->deleteFiles(SABER_HOME_CONFIG_PATH.'/lemp/nginx/config/conf.d/'.$domain.'.conf');
     }
 
     /**
      * Remove the PHP config
      *
-     * @param string $domain
+     * @param  string  $domain
      * @return void
      */
     public function removePhpConfig($domain)
     {
         info('Removing PHP configuration file...');
 
-        $this->file->deleteFiles(SABER_HOME_CONFIG_PATH . '/lemp/php/config/' . $domain . '.conf');
+        $this->file->deleteFiles(SABER_HOME_CONFIG_PATH.'/lemp/php/config/'.$domain.'.conf');
     }
 
     /**
      * Removes the code directory for the app
      *
-     * @param string $domain
+     * @param  string  $domain
      * @return void
      */
     public function removeSiteCodeDirectory($domain)
     {
-        $codeFolderPath = SABER_HOME_CONFIG_PATH . '/code/' . $domain;
+        $codeFolderPath = SABER_HOME_CONFIG_PATH.'/code/'.$domain;
 
         if ($this->file->folderExists($codeFolderPath)) {
             $this->file->removeDirectory($codeFolderPath);
@@ -188,20 +202,20 @@ class App
     /**
      * Creates the PHP configuration files
      *
-     * @param string $domain
+     * @param  string  $domain
      * @return void
      */
     public function createPhpConfig($domain)
     {
-        $phpConfig = SABER_HOME_CONFIG_PATH . '/lemp/php/config/' . $domain . '.conf';
+        $phpConfig = SABER_HOME_CONFIG_PATH.'/lemp/php/config/'.$domain.'.conf';
 
         info('Creating PHP configuration...');
 
         // Copy the PHP config file to the new app config.
-        $this->file->copyFile(SABER_HOME_CONFIG_PATH . '/lemp/php/config/www.conf', $phpConfig);
+        $this->file->copyFile(SABER_HOME_CONFIG_PATH.'/lemp/php/config/www.conf', $phpConfig);
 
         // Replace the app name in the PHP configs
-        replace('\[www\]', '[' . $domain . ']', $phpConfig);
+        replace('\[www\]', '['.$domain.']', $phpConfig);
 
         // Clean up config files, removing all the unwanted commented out code
         $this->cleanup([$phpConfig], ';');
@@ -210,8 +224,8 @@ class App
     /**
      * Cleans up a file, removing comments
      *
-     * @param array $filename
-     * @param string $delimiter
+     * @param  array  $filename
+     * @param  string  $delimiter
      * @return void
      */
     public function cleanUp(array $filename, $delimiter)

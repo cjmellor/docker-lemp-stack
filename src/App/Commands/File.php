@@ -7,9 +7,20 @@ use Symfony\Component\Filesystem\Filesystem;
 class File
 {
     /**
+     * @var Filesystem
+     */
+    private $filesystem;
+
+    /**
+     * @var Shell
+     */
+    private $cli;
+
+    /**
      * Filesystem configuration class instance
      *
-     * @param Filesystem $filesystem
+     * @param  Filesystem  $filesystem
+     * @param  Shell  $cli
      */
     public function __construct(Filesystem $filesystem, Shell $cli)
     {
@@ -34,9 +45,9 @@ class File
     /**
      * Create a directory
      *
-     * @param string $folderName
-     * @param boolean $recursive
-     * @param integer $mode
+     * @param  string  $folderName
+     * @param  bool  $recursive
+     * @param  int  $mode
      * @return void
      */
     public function createDirectory($folderName, $recursive = true, $mode = 0755)
@@ -47,7 +58,7 @@ class File
     /**
      * Removes a directory
      *
-     * @param array|string $folderName
+     * @param  array|string  $folderName
      * @return void
      */
     public function removeDirectory($folderName)
@@ -58,7 +69,7 @@ class File
     /**
      * Check if a file exists
      *
-     * @param string $file
+     * @param  string  $file
      * @return bool
      */
     public function fileExists($file)
@@ -69,7 +80,7 @@ class File
     /**
      * Make sure a folder exists.
      *
-     * @param string $folder
+     * @param  string  $folder
      * @return bool
      */
     public function folderExists($folder)
@@ -80,8 +91,8 @@ class File
     /**
      * Copy directories to a location
      *
-     * @param string $source
-     * @param string $dest
+     * @param  string  $source
+     * @param  string  $dest
      * @return void
      */
     public function moveDirectories($source, $dest)
@@ -98,9 +109,9 @@ class File
     /**
      * Copy a file to a destination
      *
-     * @param string $source
-     * @param string $dest
-     * @param boolean $overwrite
+     * @param  string  $source
+     * @param  string  $dest
+     * @param  bool  $overwrite
      * @return void
      */
     public function copyFile($source, $dest, $overwrite = false)
@@ -111,7 +122,7 @@ class File
     /**
      * Removes a single or multiple files
      *
-     * @param array|string $files
+     * @param  array|string  $files
      * @return void
      */
     public function deleteFiles($files)
@@ -122,8 +133,8 @@ class File
     /**
      * Put content into a file.
      *
-     * @param string $filename
-     * @param string $content
+     * @param  string  $filename
+     * @param  string  $content
      * @return void
      */
     public function putContent($filename, $content)

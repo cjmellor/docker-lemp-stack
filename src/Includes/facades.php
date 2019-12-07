@@ -11,7 +11,7 @@ class Facades
      */
     public static function containerKey()
     {
-        return 'Saber\\' . basename(str_replace('\\', '/', get_called_class()));
+        return 'Saber\\'.basename(str_replace('\\', '/', get_called_class()));
     }
 
     /**
@@ -20,6 +20,7 @@ class Facades
      * @param  string  $method
      * @param  array  $parameters
      * @return mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public static function __callStatic($method, $parameters)
     {
@@ -32,18 +33,23 @@ class Facades
 class Docker extends Facades
 {
 }
+
 class Shell extends Facades
 {
 }
+
 class File extends Facades
 {
 }
+
 class Config extends Facades
 {
 }
+
 class App extends Facades
 {
 }
+
 class Secure extends Facades
 {
 }

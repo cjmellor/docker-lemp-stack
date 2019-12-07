@@ -2,10 +2,13 @@
 
 namespace Saber;
 
+use Exception;
+
 class Secure
 {
     public $file;
     public $site;
+    public $certPath;
 
     /**
      * Secure configuration class instance
@@ -23,20 +26,21 @@ class Secure
     /**
      * Check if the certificate already exists
      *
-     * @param string $domain
-     * @param bool $unsecure
+     * @param  string  $domain
+     * @param  bool  $unsecure
      * @return void
+     * @throws Exception
      */
     public function checkSecureStatus($domain, $unsecure = false)
     {
         $sitePath = SABER_HOME_CONFIG_PATH . "/lemp/nginx/config/conf.d/{$domain}.conf";
 
         if ($this->file->fileExists($this->certPath . "{$domain}.crt") && (!$unsecure === true)) {
-            throw new \Exception('The site is already secure.');
+            throw new Exception('The site is already secure.');
         }
 
         if (!$this->file->fileExists($sitePath)) {
-            throw new \Exception('This site does not exist');
+            throw new Exception('This site does not exist');
         }
     }
 

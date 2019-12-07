@@ -9,8 +9,9 @@ class Shell
     /**
      * Run a command - shorthand
      *
-     * @param string $command
-     * @param callable $error
+     * @param  string  $command
+     * @param  callable  $error
+     * @param  bool  $verbose
      * @return void
      */
     public function run($command, callable $error = null, $verbose = false)
@@ -21,9 +22,10 @@ class Shell
     /**
      * Run a command on the terminal
      *
-     * @param string $command
-     * @param callable $error
-     * @return void
+     * @param  string  $command
+     * @param  callable  $error
+     * @param  bool  $verbose
+     * @return string
      */
     public function runCommand($command, callable $error = null, $verbose = false)
     {
@@ -31,13 +33,15 @@ class Shell
 
         $shellOutput = '';
 
-        $process->setTimeout(null)->run(function ($type, $line) use (&$shellOutput, $verbose) {
-            if ($verbose) {
-                echo $line;
-            }
+        $process->setTimeout(null)->run(
+            function ($type, $line) use (&$shellOutput, $verbose) {
+                if ($verbose) {
+                    echo $line;
+                }
 
-            $shellOutput .= $line;
-        });
+                $shellOutput .= $line;
+            }
+        );
 
         if ($process->getExitCode() > 0) {
             $error($process->getExitCode(), $shellOutput);

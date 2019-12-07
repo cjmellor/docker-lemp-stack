@@ -11,8 +11,7 @@ class Docker
     /**
      * Create new Docker instance
      *
-     * @param boolean $verbose
-     * @param Shell $cli
+     * @param  Shell  $cli
      */
     public function __construct(Shell $cli)
     {
@@ -22,7 +21,7 @@ class Docker
     /**
      * Build the Docker containers
      *
-     * @param boolean $verbose
+     * @param  bool  $verbose
      * @return void
      */
     public function buildContainers($verbose = false)
@@ -37,7 +36,7 @@ class Docker
     /**
      * Restarts Docker containers
      *
-     * @param boolean $verbose
+     * @param  bool  $verbose
      * @return void
      */
     public function restartContainers($verbose = false)
@@ -52,7 +51,7 @@ class Docker
     /**
      * Destroys Docker containers
      *
-     * @param boolean $verbose
+     * @param  bool  $verbose
      * @return void
      */
     public function destroyContainers($verbose = false)
@@ -67,14 +66,14 @@ class Docker
     /**
      * Run a Docker command
      *
-     * @param string $cmd
-     * @param boolean $verbose
+     * @param  string  $cmd
+     * @param  bool  $verbose
      * @return void
      */
     public function docker($cmd, $verbose = false)
     {
         return $this->cli->run(
-            'docker ' . $cmd,
+            'docker '.$cmd,
             function ($errorCode, $errorMsg) {
                 error($errorMsg);
             },
@@ -85,15 +84,15 @@ class Docker
     /**
      * Run a docker-compose command
      *
-     * @param string $cmd
-     * @param boolean $verbose
+     * @param  string  $cmd
+     * @param  bool  $verbose
      * @return void
      */
     public function dockerCompose($cmd, $verbose = false)
     {
         // If errors, remove 'return'
         return $this->cli->run(
-            'docker-compose -f ' . SABER_HOME_CONFIG_PATH . '/docker-compose.yml ' . $cmd,
+            'docker-compose -f '.SABER_HOME_CONFIG_PATH.'/docker-compose.yml '.$cmd,
             function ($errorCode, $errorMsg) {
                 error($errorMsg);
             },
@@ -110,15 +109,14 @@ class Docker
     {
         $images = $this->docker("images --format '\"{{.Repository}}:{{.Tag}}\"' --filter=reference='*' | jq -r");
 
-        $image = explode("\n", substr($images, 0, -1));
-
-        return $image;
+        return explode("\n", substr($images, 0, -1));
     }
 
     /**
      * Upgrade a Docker image
      *
-     * @param array $images
+     * @param  array  $images
+     * @param  bool  $verbose
      * @return void
      */
     public function upgradeImages($images, $verbose = false)
@@ -131,10 +129,11 @@ class Docker
     }
 
     /**
-     * Pull the latest contaier image
+     * Pull the latest container image
      *
-     * @param string $image
-     * @return void
+     * @param $images
+     * @param  bool  $verbose
+     * @return int
      */
     public function pull($images, $verbose = false)
     {
@@ -142,7 +141,7 @@ class Docker
         $countImages = count($images);
         $imagesUpdated = 0;
 
-        info("Updrading $countImages containers...");
+        info("Upgrading $countImages containers...");
 
         foreach ($images as $key => $image) {
             $key = $key + 1;
@@ -151,7 +150,7 @@ class Docker
             if ($this->isNewVersion($image)) {
                 info("($key/$countImages) Getting latest image of '$image'");
 
-                $this->docker('pull ' . $image, $verbose ?? true);
+                $this->docker('pull '.$image, $verbose ?? true);
 
                 $imagesUpdated++;
             } else {
@@ -172,7 +171,7 @@ class Docker
         // Clean up unused images
         $this->clean();
 
-        // Shut down the containters
+        // Shut down the containers
         $this->destroyContainers();
 
         // Re-build new containers
@@ -192,20 +191,22 @@ class Docker
     /**
      * Check if a new version of a container image is available
      *
-     * @param string $image
-     * @return bool
+     * @param  string  $image
+     * @return void
      */
     public function isNewVersion($image)
     {
-        $cmdOutput = (new Process($this->docker('pull ' . $image)));
+        $cmdOutput = (new Process($this->docker('pull '.$image)));
         $cmdOutput->start();
 
-        $cmdOutput->wait(function ($type, $buffer) {
-            if (contains($buffer, 'Image is up to date')) {
-                return false;
-            }
+        $cmdOutput->wait(
+            function ($type, $buffer) {
+                if (contains($buffer, 'Image is up to date')) {
+                    return false;
+                }
 
-            return true;
-        });
+                return true;
+            }
+        );
     }
 }
