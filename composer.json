@@ -13,7 +13,8 @@
     "symfony/filesystem": "~3.0 | ~4.0",
     "symfony/finder": "~3.0 | ~4.0",
     "symfony/process": "~3.0 | ~4.0",
-    "mnapoli/silly": "^1.7"
+    "mnapoli/silly": "^1.7",
+    "tightenco/collect": "^6.6"
   },
   "authors": [
     {
