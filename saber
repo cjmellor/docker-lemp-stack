@@ -194,4 +194,13 @@ $app->command('upgrade', function (InputInterface $input, OutputInterface $outpu
     Docker::upgradeImages($answers, $input->getOption('verbose'));
 })->descriptions('Upgrade containers to their newest version');
 
+$app->command(
+    'apps',
+    function () {
+        $apps = App::getApps();
+
+        table(['Running Apps'], $apps->all());
+    }
+)->descriptions('Show a list of apps that are running');
+
 $app->run();

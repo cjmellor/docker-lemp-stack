@@ -222,4 +222,36 @@ class App
             $this->file->putContent($configFilename, $newOutput);
         }
     }
+
+    /**
+     * Get a list of apps that have been created
+     *
+     * @return \Tightenco\Collect\Support\Collection
+     */
+    public function getApps()
+    {
+        return collect($this->file->scanDir($this->codeDir()))
+            ->reject(
+                function ($apps) {
+                    return in_array($apps, ['.gitignore']);
+                }
+            )->map(
+                function ($apps) {
+                    return [
+                        'app' => $apps
+                    ];
+                }
+            );
+    }
+
+    /**
+     * The path to the 'code' directory
+     *
+     * @return string
+     */
+    public function codeDir()
+    {
+        return SABER_HOME_CONFIG_PATH.'/code';
+    }
+
 }

@@ -130,4 +130,20 @@ class File
     {
         $this->filesystem->dumpFile($filename, $content);
     }
+
+    /**
+     * Scan a folder and return an array
+     *
+     * @param $path
+     * @return array
+     */
+    public function scanDir($path)
+    {
+        return collect(scandir($path))
+            ->reject(
+                function ($file) {
+                    return in_array($file, ['.', '..']);
+                }
+            )->values()->all();
+    }
 }
